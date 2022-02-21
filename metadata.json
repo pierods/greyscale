@@ -1,8 +1,8 @@
 {
   "name": "Greyscale",
-  "description": "Greyscale",
   "uuid": "greyscale@easy67.com",
-  "shell-version": [
-    "40"
-  ]
+  "description": "Greyscale is an extensions to make a wayland session greyscale",
+  "version": "1.0.0",
+  "shell-version": ["40"],
+  "url": "https://github.com/pierods/greyscale"
 }

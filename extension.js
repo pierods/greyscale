@@ -22,7 +22,7 @@ const GETTEXT_DOMAIN = 'my-indicator-extension';
 const Gettext = imports.gettext.domain(GETTEXT_DOMAIN);
 const _ = Gettext.gettext;
 
-const { GObject, St, Gio, Gtk } = imports.gi;
+const {GObject, St, Gio, Gtk} = imports.gi;
 const Clutter = imports.gi.Clutter;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
@@ -35,61 +35,57 @@ let color_effect;
 let contrast_effect;
 
 function _toggleEffect() {
-    if ( Main.uiGroup.has_effects( color_effect ) ) {
-        Main.uiGroup.remove_effect( color_effect );
-        Main.uiGroup.remove_effect( contrast_effect );
+    if (Main.uiGroup.has_effects(color_effect)) {
+        Main.uiGroup.remove_effect(color_effect);
+        Main.uiGroup.remove_effect(contrast_effect);
     } else {
-        Main.uiGroup.add_effect( color_effect );
-        Main.uiGroup.add_effect( contrast_effect );
+        Main.uiGroup.add_effect(color_effect);
+        Main.uiGroup.add_effect(contrast_effect);
     }
 }
 
 
 const Indicator = GObject.registerClass(
-class Indicator extends PanelMenu.Button {
-    _init() {
-        super._init(0.0, _('Greyscale Indicator'));
+    class Indicator extends PanelMenu.Button {
+        _init() {
+            super._init(0.0, _('Greyscale Indicator'));
 
-       this.add_child(new St.Icon({
-            icon_name: 'applications-graphics-symbolic',
-            style_class: 'system-status-icon',
-        }));
-	
-        let item = new PopupMenu.PopupMenuItem(_('Toggle greyscale'));
-        item.connect('activate', () => {
-            _toggleEffect();
-        });
-        this.menu.addMenuItem(item);
-        
-        //let slider = Gtk.Scale.new_with_range(Gtk.GTK_ORIENTATION_HORIZONTAL, 0, 1, 0.1)
-        //this.menu.addMenuItem(slider)
-    }
-});
+            this.add_child(new St.Icon({
+                icon_name: 'applications-graphics-symbolic',
+                style_class: 'system-status-icon',
+            }));
+
+            let item = new PopupMenu.PopupMenuItem(_('Toggle greyscale'));
+            item.connect('activate', () => {
+                _toggleEffect();
+            });
+            this.menu.addMenuItem(item);
+        }
+    });
 
 class Extension {
     constructor(uuid) {
         this._uuid = uuid;
-
-        ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
     }
 
     enable() {
-	this._indicator = new Indicator();
+        color_effect = new Clutter.DesaturateEffect();
+        contrast_effect = new Clutter.BrightnessContrastEffect();
+        contrast_effect.set_contrast(0.08)
+
+        this._indicator = new Indicator();
         Main.panel.addToStatusArea(this._uuid, this._indicator);
     }
 
     disable() {
         this._indicator.destroy();
         this._indicator = null;
+        color_effect = null;
+        contrast_effect = null;
     }
 }
 
 function init(meta) {
-
-    //Creation of effect
-    color_effect = new Clutter.DesaturateEffect();
-    contrast_effect = new Clutter.BrightnessContrastEffect();
-    contrast_effect.set_contrast(0.08)
-    
+    ExtensionUtils.initTranslations(GETTEXT_DOMAIN);
     return new Extension(meta.uuid);
 }
